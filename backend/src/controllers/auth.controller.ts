@@ -1,5 +1,11 @@
 import type { RequestHandler } from "express";
 import { AppError } from "../errors/AppError";
+import bcrypt from "bcryptjs";
+import { prisma } from "../lib/prisma";
+import jwt from "jsonwebtoken";
+
+
+
 import {
   validateForgotPassword,
   validateLogin,
@@ -54,15 +60,41 @@ export const register: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const login: RequestHandler = (req, _res) => {
-  validateLogin(req.body);
-  throw notImplemented("O login");
-};
+export const login: RequestHandler = async (req, res, next) => {
+  try {
+    const { email, password } = validateLogin(req.body);
 
+    const user = await prisma.user.findUnique({
+      where: { email: email.trim().toLowerCase() },
+    });
+
+    const passwordMatches = user
+      ? await bcrypt.compare(password, user.passwordHash)
+      : false;
+
+    if (!user || !passwordMatches) {
+      throw new AppError(401, "INVALID_CREDENTIALS", "E-mail ou senha inválidos.");
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error("JWT_SECRET não definida.");
+    }
+
+    const token = jwt.sign({ role: user.role }, secret, {
+      subject: user.id,
+      expiresIn: "1d",
+    });
+
+    res.status(200).json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 export const forgotPassword: RequestHandler = (req, _res) => {
   validateForgotPassword(req.body);
   throw notImplemented("A recuperação de senha");
 };
-
-import bcrypt from "bcryptjs";
-import { prisma } from "../lib/prisma";
