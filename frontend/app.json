@@ -19,6 +19,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "lang": "pt-BR",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [

@@ -9,6 +9,7 @@ export const colors = {
   border: '#D9DBE6',
   error: '#C62848',
   errorBg: '#FDECEF',
+  success: '#2E8B5E',
 };
 
 export const fonts = {

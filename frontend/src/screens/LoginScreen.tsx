@@ -1,15 +1,17 @@
 import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView, Platform, Pressable, ScrollView,
-  StyleSheet, Text, TextInput, View,
+  StyleSheet, Text, type TextInputInstance, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../components/Button';
 import { Logo } from '../components/Logo';
 import { TextField } from '../components/TextField';
+import { DemoLoginPanel } from '../components/DemoLoginPanel';
 import type { AuthStackParamList } from '../navigation/types';
 import { authService, InvalidCredentialsError } from '../services/authService';
+import { demoCredentials, signInDemo } from '../services/demoAuthService';
 import { colors, fonts, radius } from '../theme';
 import { validateEmail, validatePassword } from '../utils/validation';
 
@@ -21,7 +23,8 @@ export function LoginScreen({ navigation }: Props) {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [formError, setFormError] = useState<string>();
   const [loading, setLoading] = useState(false);
-  const passwordRef = useRef<TextInput>(null);
+  const [demo, setDemo] = useState(false);
+  const passwordRef = useRef<TextInputInstance>(null);
 
   async function handleLogin() {
     if (loading) return; // evita envio duplicado
@@ -33,13 +36,23 @@ export function LoginScreen({ navigation }: Props) {
 
     setLoading(true);
     try {
+      if (__DEV__ && demo) {
+        await signInDemo({ email, password });
+        setPassword('');
+        navigation.navigate('StudentArea');
+        return;
+      }
       await authService.signIn({ email: email.trim(), password });
       // TODO: navegar para o Dashboard quando a navegação logada existir
     } catch (e) {
       setFormError(
         e instanceof InvalidCredentialsError
-          ? 'E-mail ou senha incorretos.'
-          : 'Não foi possível entrar agora. Tente novamente em instantes.'
+          ? demo ? 'E-mail ou senha da demonstração incorretos.' : 'E-mail ou senha incorretos.'
+          : e instanceof Error && e.message === 'AUTH_NOT_CONFIGURED'
+            ? __DEV__
+              ? 'O login real ainda não está disponível. Selecione Demonstração ou use o acesso demonstrativo abaixo.'
+              : 'O login real ainda não está disponível nesta versão.'
+            : 'Não foi possível entrar agora. Tente novamente em instantes.'
       );
     } finally {
       setLoading(false);
@@ -56,6 +69,26 @@ export function LoginScreen({ navigation }: Props) {
             <Text style={styles.subtitle}>Seu assistente pessoal de estudos</Text>
 
             <View style={styles.card}>
+              {__DEV__ && (
+                <DemoLoginPanel
+                  demo={demo}
+                  disabled={loading}
+                  onChange={(next) => {
+                    setDemo(next);
+                    setEmail('');
+                    setPassword('');
+                    setErrors({});
+                    setFormError(undefined);
+                  }}
+                  onFill={() => {
+                    if (!demoCredentials) return;
+                    setEmail(demoCredentials.email);
+                    setPassword(demoCredentials.password);
+                    setErrors({});
+                    setFormError(undefined);
+                  }}
+                />
+              )}
               <TextField
                 label="E-mail"
                 placeholder="seu@email.com"
@@ -107,6 +140,20 @@ export function LoginScreen({ navigation }: Props) {
             <View style={styles.full}>
               <Button title="Criar conta" variant="secondary" onPress={() => navigation.navigate('SignUp')} />
             </View>
+            {__DEV__ && (
+              <Pressable
+                onPress={() => {
+                  setPassword('');
+                  navigation.navigate('StudentArea');
+                }}
+                disabled={loading}
+                accessibilityRole="button"
+                accessibilityLabel="Visualizar área do aluno (demonstração)"
+                style={styles.demoAccess}
+              >
+                <Text style={styles.demoAccessText}>Visualizar área do aluno (demonstração)</Text>
+              </Pressable>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -138,4 +185,6 @@ const styles = StyleSheet.create({
   forgotText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.primary },
   noAccount: { fontFamily: fonts.regular, fontSize: 14, color: colors.textMuted, marginBottom: 8 },
   full: { width: '100%' },
+  demoAccess: { minHeight: 48, justifyContent: 'center', marginTop: 16, paddingVertical: 8 },
+  demoAccessText: { fontFamily: fonts.semibold, fontSize: 13, lineHeight: 20, textAlign: 'center', color: colors.primary },
 });

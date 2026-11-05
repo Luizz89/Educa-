@@ -7,9 +7,10 @@ type Props = {
   variant?: 'primary' | 'secondary';
   loading?: boolean;
   disabled?: boolean;
+  accessibilityLabel?: string;
 };
 
-export function Button({ title, onPress, variant = 'primary', loading, disabled }: Props) {
+export function Button({ title, onPress, variant = 'primary', loading, disabled, accessibilityLabel = title }: Props) {
   const isDisabled = disabled || loading;
   const isPrimary = variant === 'primary';
 
@@ -18,8 +19,10 @@ export function Button({ title, onPress, variant = 'primary', loading, disabled 
       onPress={onPress}
       disabled={isDisabled}
       accessibilityRole="button"
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled: !!isDisabled, busy: !!loading }}
+      aria-disabled={!!isDisabled}
+      aria-busy={!!loading}
       style={({ pressed }) => [
         styles.base,
         isPrimary ? styles.primary : styles.secondary,

@@ -55,12 +55,11 @@ export function ForgotPasswordScreen({ navigation }: Props) {
               <>
                 <Ionicons name="mail-outline" size={56} color={colors.primary} style={styles.center} />
                 <Text style={[styles.title, styles.centerText]} accessibilityRole="header">
-                  Verifique seu e-mail
+                  Simulação de envio concluída
                 </Text>
-                {/* Mensagem genérica: não revela se a conta existe */}
+                {/* Confirmação explícita da simulação, sem afirmar envio real. */}
                 <Text style={[styles.subtitle, styles.centerText]}>
-                  Se existir uma conta com o e-mail {sentTo}, enviamos um link para redefinir sua senha.
-                  Confira também a caixa de spam.
+                  Esta é uma prévia da recuperação para {sentTo}. Nenhum e-mail foi enviado nesta demonstração.
                 </Text>
                 {formErrorBox}
                 <View style={styles.actions}>
@@ -72,7 +71,7 @@ export function ForgotPasswordScreen({ navigation }: Props) {
               <>
                 <Text style={styles.title} accessibilityRole="header">Esqueceu a senha?</Text>
                 <Text style={styles.subtitle}>
-                  Informe o e-mail da sua conta e enviaremos um link para redefinir sua senha.
+                  Informe o e-mail para testar o fluxo de recuperação. O envio do link é demonstrativo nesta versão.
                 </Text>
                 <TextField
                   label="E-mail"

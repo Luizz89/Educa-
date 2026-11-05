@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignUpScreen } from '../screens/SignUpScreen';
+import { StudentNavigation } from './StudentNavigator';
 import { colors } from '../theme';
 import type { AuthStackParamList } from './types';
 
@@ -14,6 +15,7 @@ export function Navigation() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        {__DEV__ && <Stack.Screen name="StudentArea" component={StudentNavigation} />}
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}
