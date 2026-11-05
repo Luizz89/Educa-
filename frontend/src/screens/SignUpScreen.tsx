@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import {
-  KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View,
+  KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, type TextInputInstance, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -38,8 +38,8 @@ export function SignUpScreen({ navigation }: Props) {
   const [formError, setFormError] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  const emailRef = useRef<TextInput>(null);
-  const confirmRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInputInstance>(null);
+  const confirmRef = useRef<TextInputInstance>(null);
 
   // Validação por etapa
   function validateStep(): boolean {
@@ -99,10 +99,10 @@ export function SignUpScreen({ navigation }: Props) {
           <View style={styles.container}>
             <Ionicons name="checkmark-circle" size={64} color={colors.success} style={styles.center} />
             <Text style={[styles.title, styles.centerText]} accessibilityRole="header">
-              Conta criada!
+              Cadastro demonstrativo concluído!
             </Text>
             <Text style={[styles.subtitle, styles.centerText]}>
-              Bem-vindo(a) ao Educa+, {name.trim().split(' ')[0]}. Entre com seu e-mail e senha para começar.
+              {name.trim().split(' ')[0]}, esta simulação não cria uma conta no banco. Use a demonstração do login para conhecer a área do aluno.
             </Text>
             <Button title="Ir para o login" onPress={() => navigation.navigate('Login')} />
           </View>
@@ -117,7 +117,7 @@ export function SignUpScreen({ navigation }: Props) {
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.container}>
             <Text style={styles.title} accessibilityRole="header">Criar conta</Text>
-            <Text style={styles.subtitle}>Configure seu perfil em {TOTAL_STEPS} etapas.</Text>
+            <Text style={styles.subtitle}>Configure seu perfil em {TOTAL_STEPS} etapas. Nesta versão, o cadastro é demonstrativo e não salva dados no banco.</Text>
 
             <View
               style={styles.track}

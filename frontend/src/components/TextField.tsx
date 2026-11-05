@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, type TextInputInstance, type TextInputProps, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, radius } from '../theme';
 
@@ -9,7 +9,7 @@ type Props = TextInputProps & {
   isPassword?: boolean;
 };
 
-export const TextField = forwardRef<TextInput, Props>(
+export const TextField = forwardRef<TextInputInstance, Props>(
   ({ label, error, isPassword, ...rest }, ref) => {
     const [hidden, setHidden] = useState(true);
 
@@ -51,6 +51,8 @@ export const TextField = forwardRef<TextInput, Props>(
   }
 );
 
+TextField.displayName = 'TextField';
+
 const styles = StyleSheet.create({
   wrapper: { marginBottom: 16 },
   label: { fontFamily: fonts.semibold, fontSize: 13, color: colors.text, marginBottom: 6 },
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   boxError: { borderColor: colors.error },
-  input: { flex: 1, fontFamily: fonts.regular, fontSize: 15, color: colors.text, paddingVertical: 10 },
-  eye: { padding: 4 },
+  input: { flex: 1, minWidth: 0, fontFamily: fonts.regular, fontSize: 15, color: colors.text, paddingVertical: 10 },
+  eye: { padding: 4, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
   error: { fontFamily: fonts.regular, fontSize: 12, color: colors.error, marginTop: 4 },
 });
